@@ -143,3 +143,11 @@ results/semantic_baseline/model_checkpoints/
 # SLURM files
 *.err
 *.out
+
+# WIP
+concept_detection/caption2concept
+concept_detection/multilabel
+concept_detection/retrieval
+concept_detection/semantic
+concept_detection/evaluator.py
+concept_detection/merge_submissions.py
