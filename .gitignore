@@ -146,7 +146,6 @@ results/semantic_baseline/model_checkpoints/
 
 # WIP
 concept_detection/caption2concept
-concept_detection/multilabel
 concept_detection/retrieval
 concept_detection/evaluator.py
 concept_detection/merge_submissions.py
