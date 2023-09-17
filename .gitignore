@@ -148,3 +148,4 @@ results/semantic_baseline/model_checkpoints/
 concept_detection/retrieval
 concept_detection/evaluator.py
 concept_detection/merge_submissions.py
+caption_prediction/
