@@ -146,4 +146,7 @@ results/semantic_baseline/model_checkpoints/
 
 # WIP
 concept_detection/merge_submissions.py
-caption_prediction/
+caption_prediction/README.md
+caption_prediction/cnn_enc_transformer_dec
+caption_prediction/train_tokenizer.py
+caption_prediction/evaluator.py
