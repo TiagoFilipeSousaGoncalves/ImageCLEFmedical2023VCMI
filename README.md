@@ -148,7 +148,46 @@ $ python concept_detection/merge_submissions.py --submission_csv_1 {path_to_subm
 
 
 ## Caption Prediction
-TBA
+### Train Tokenizer
+First, we must create a tokenizer, fitted to the captions available in the dataset:
+```bash
+$ python caption_prediction/train_tokenizer.py --datadir {path_to_the_dataset}
+```
+
+
+### Baseline Encoder-Decoder
+To train the baseline encoder-decoder approach, run:
+```bash
+$ python caption_prediction/baseline_enc_dec/train.py {check_file_for_command_line_interface_arguments}
+```
+
+To generate predictions for the baseline encoder-decoder approach, run:
+```bash
+$ python caption_prediction/baseline_enc_dec/generation.py {check_file_for_command_line_interface_arguments}
+```
+
+
+### CNN Encoder-Transformer-Decoder
+To train the CNN encoder-transformer-decoder approach, run:
+```bash
+$ python caption_prediction/cnn_enc_transformer_dec/train.py {check_file_for_command_line_interface_arguments}
+```
+
+To generate predictions for the CNN encoder-transformer-decoder approach, run:
+```bash
+$ python caption_prediction/cnn_enc_transformer_dec/generation.py {check_file_for_command_line_interface_arguments}
+```
 
 ### Evaluation
-TBA
+You can obtain evaluation metrics by running the official evaluator of the competition:
+```bash
+$ python caption_prediction/evaluator.py --gt {path_to_groundtruth_file} --pred {path_to_submission_file}
+```
+
+
+
+## Citation
+If you use our repository consider citing our paper:
+```bibtex
+    TBA
+```
