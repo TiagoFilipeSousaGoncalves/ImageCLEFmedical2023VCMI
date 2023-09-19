@@ -1,5 +1,6 @@
 # Imports
 import os
+import argparse
 import numpy as np
 import shutil
 import pandas as pd
@@ -9,7 +10,6 @@ from tqdm import tqdm
 os.environ["KERAS_BACKEND"] = "tensorflow"
 
 # Tensorflow & Keras Imports
-import tensorflow.keras.backend as K
 from tensorflow.keras.layers import Dense, Dropout, Input, LeakyReLU, concatenate
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.models import Model
@@ -17,28 +17,48 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.callbacks import ModelCheckpoint
 from tensorflow.keras.applications.vgg16 import VGG16
 
-# Sklearn Imports
-import sklearn.metrics
-
 # Project Imports
 from load_autoregressive_data import ImageClefDataset
+from model_utilities import build_classification_model, make_trainable, show_metrics
+
+
+
+# Command Line Interface
+parser = argparse.ArgumentParser()
+parser.add_argument("--num_labels", type=int, default=256, help="Number of labels.")
+parser.add_argument("--embed_size", type=int, default=2048, help="Size of the embedding.")
+parser.add_argument("--epochs", type=int, default=1000, help="Number of training epochs.")
+parser.add_argument("--opt", type=str, default='Adam', choices=['Adam'], help="Optimiser.")
+parser.add_argument("--lr", type=float, default=1e-5, help="Learning rate.")
+parser.add_argument("--img_height", type=int, default=224, help="Image height.")
+parser.add_argument("--img_width", type=int, default=224, help="Image width.")
+parser.add_argument("--img_channels", type=int, default=3, help="Image channels.")
+parser.add_argument("--num_layers", type=int, default=17, help="Number of classification layers for the autoregressive model.")
+parser.add_argument("--num_units", type=int, default=125, help="Number of units for the dense layers.")
+parser.add_argument("--concepts_filename", type=str, default='top2125_concepts.csv', help="The concepts filename.")
+parser.add_argument("--checkpoint_path", type=str, default= "./models_vgg", help="The path for the checkpoints.")
+args = parser.parse_args()
 
 
 
 # Training hyperparameters
-num_labels = 256
-embed_size = 2048
-epochs = 1000
-opt = Adam(lr=1e-5)
-train_shape = (224, 224, 3)
-num_layers = 17
-num_units = 125
+num_labels = args.num_labels
+embed_size = args.embed_size
+epochs = args.epochs
+
+if args.opt == 'Adam':
+    opt = Adam(lr=args.lr)
+
+train_shape = (args.img_height, args.img_width, args.img_channels)
+
+num_layers = args.num_layers
+num_units = args.num_units
 
 
 
 # Load data
 print('Reading concepts...')
-concepts_filename = 'top2125_concepts.csv'
+concepts_filename = args.concepts_filename
 concepts_csv = pd.read_csv(concepts_filename, sep="\t")
 all_concepts = concepts_csv["concept"]
 concepts = []
@@ -56,67 +76,46 @@ print('Loading train data...', flush=True)
 train_data = ImageClefDataset(
     dict_concept,
     'ImageCLEFmedical_Caption_2023_concept_detection_train_labels.csv',
-    'train_resized', 0,
-    concepts, num_labels
+    'train_resized',
+    0,
+    concepts,
+    num_labels
 )
 
 print('Loading valid data...', flush=True)
 valid_data = ImageClefDataset(
     dict_concept,
     'ImageCLEFmedical_Caption_2023_concept_detection_train_labels.csv',
-    'train_resized', 1,
-    concepts, num_labels
+    'train_resized',
+    1,
+    concepts,
+    num_labels
 )
 
 print('Loading test data...', flush=True)
 test_data = ImageClefDataset(
     dict_concept,
     'ImageCLEFmedical_Caption_2023_concept_detection_valid_labels.csv',
-    'valid_resized', 2,
-    concepts, num_labels
+    'valid_resized',
+    2,
+    concepts,
+    num_labels
 )
 
 infer_data = ImageClefDataset(
     dict_concept,
     'ImageCLEFmedical_Caption_2023_concept_detection_valid_labels.csv',
-    'test_resized', 3,
-    concepts, num_labels
+    'test_resized',
+    3,
+    concepts,
+    num_labels
 )
-
-
-
-# Function: Make model trainable
-def make_trainable(net, val):
-    net.trainable = val
-    for l in net.layers:
-      l.trainable = val
-
-
-
-# Function: Build classification model
-def build_classification_model(iteration):
-    feat_input = Input((512,))
-    if iteration == 0:
-        x = feat_input
-    else:
-        label_input = Input((iteration * num_units,))
-        x = concatenate([feat_input, label_input])
-
-    x = Dense(num_units, activation='sigmoid')(x)
-    if i == 0:
-        label_encoder = Model(feat_input, x)
-    else:
-        label_encoder = Model([feat_input, label_input], x)
-    label_encoder.compile(loss='binary_crossentropy', optimizer=opt)
-    return label_encoder
 
 
 
 # Build and compile model
 input_img = Input(train_shape)
-
-feature_extractor = VGG16(weights="imagenet", include_top=False, pooling='avg', input_tensor=Input(shape=(224, 224, 3)))
-
+feature_extractor = VGG16(weights="imagenet", include_top=False, pooling='avg', input_tensor=Input(shape=train_shape))
 features = feature_extractor(input_img)
 features = Dense(512)(features)
 features = LeakyReLU(0.2)(features)
@@ -124,8 +123,9 @@ features = Dropout(0.25)(features)
 features = Dense(512)(features)
 features = LeakyReLU(0.2)(features)
 concept_detectors = []
+
 for i in range(num_layers):
-    new_concept_detector = build_classification_model(i)
+    new_concept_detector = build_classification_model(i, num_units, opt)
     if i == 0:
         output = new_concept_detector(features)
     else:
@@ -140,9 +140,9 @@ training_model.summary()
 
 
 # Create path to save the model
-path = "./models_vgg"
+path = args.checkpoint_path
 if os.path.isdir(path) == True:
-  shutil.rmtree(path)
+    shutil.rmtree(path)
 os.makedirs(path)
 
 
@@ -163,13 +163,7 @@ training_model.fit_generator(train_data, validation_data=valid_data, callbacks=[
 
 
 
-# Function: Show metrics
-def show_metrics(y_true, y_pred):
-    print('Exact Match Ratio: ' + str(sklearn.metrics.accuracy_score(y_true, y_pred, normalize=True, sample_weight=None)))
-    print('Hamming loss: ' + str(sklearn.metrics.hamming_loss(y_true, y_pred)))
-    print('Recall: ' + str(sklearn.metrics.precision_score(y_true=y_true, y_pred=y_pred, average='samples')))
-    print('Precision: ' + str(sklearn.metrics.recall_score(y_true=y_true, y_pred=y_pred, average='samples')))
-    print('F1-Score: ' + str(sklearn.metrics.f1_score(y_true=y_true, y_pred=y_pred, average='samples')))
+
 
 
 

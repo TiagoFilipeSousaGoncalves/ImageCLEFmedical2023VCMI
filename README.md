@@ -79,8 +79,72 @@ $ python concept_detection/adversarial/model_predict.py {check_file_for_command_
 ```
 
 
+### Autoregressive
+To train and generate prediction for the autoregressive approach, run:
+```bash
+$ python concept_detection/autoregressive/autoregressive_model.py {check_file_for_command_line_interface_arguments}
+```
+
+
+### Caption2Concept
+To train the caption2concept approach, run:
+```bash
+$ python concept_detection/caption2concept/train.py {check_file_for_command_line_interface_arguments}
+```
+
+To generate predictions for the caption2concept approach, run:
+```bash
+$ python concept_detection/caption2concept/inference.py {check_file_for_command_line_interface_arguments}
+```
+
+
+### Multilabel
+To train the multilabel approach, run:
+```bash
+$ python concept_detection/multilabel/train.py {check_file_for_command_line_interface_arguments}
+```
+
+To generate predictions for the multilabel approach, run:
+```bash
+$ python concept_detection/multilabel/inference.py {check_file_for_command_line_interface_arguments}
+```
+
+
+### Retrieval
+To train the retrieval approach, run:
+```bash
+$ python concept_detection/retrieval/retrieval.py {check_file_for_command_line_interface_arguments}
+```
+
+To generate predictions for the retrieval approach, run:
+```bash
+$ python concept_detection/retrieval/image_retrieval.py {check_file_for_command_line_interface_arguments}
+```
+
+
+### Semantic
+To train the semantic approach, run:
+```bash
+$ python concept_detection/semantic/model_train.py {check_file_for_command_line_interface_arguments}
+```
+
+To generate predictions for the semantic approach, run:
+```bash
+$ python concept_detection/semantic/model_predict.py {check_file_for_command_line_interface_arguments}
+```
+
 ### Evaluation
-TBA
+You can obtain evaluation metrics by running the official evaluator of the competition:
+```bash
+$ python concept_detection/evaluator.py --ground_truth_path {path_to_groundtruth_file} --submission_file_path {path_to_submission_file}
+```
+
+
+### Merge Submissions
+If you want to replicate our procedure on merging submissions:
+```bash
+$ python concept_detection/merge_submissions.py --submission_csv_1 {path_to_submission_file_1} --submission_csv_2 {path_to_submission_file_2}
+```
 
 
 ## Caption Prediction
