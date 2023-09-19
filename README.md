@@ -7,8 +7,10 @@ You can find the paper [here](#).
 For more information please contact [isabel.riotorto@inesctec.pt](mailto:isabel.riotorto@inesctec.pt) or [maria.h.sampaio@inesctec.pt](mailto:maria.h.sampaio@inesctec.pt).
 
 
+
 ## Requirements
 You can find the package requirements in the [requirements.txt](requirements.txt) file.
+
 
 
 ## Dataset Structure
@@ -20,6 +22,8 @@ dataset
     ImageCLEFmedical_Caption_2023_concept_detection_train_labels.csv
     ImageCLEFmedical_Caption_2023_concept_detection_valid_labels.csv
 ```    
+
+
 
 ## Exploratory Data Analysis & Preprocessing
 ### Resize images (offline)
@@ -61,8 +65,18 @@ $ python data_preprocessing/merge_train_val.py --base_dir {path_to_dataset_dir} 
 ```
 
 
+
 ## Concept Detection
-TBA
+### Adversarial
+To train the adversarial approach, run:
+```bash
+$ python concept_detection/adversarial/model_train.py {check_file_for_command_line_interface_arguments}
+```
+
+To generate predictions for the adversarial approach, run:
+```bash
+$ python concept_detection/adversarial/model_predict.py {check_file_for_command_line_interface_arguments}
+```
 
 
 ### Evaluation
