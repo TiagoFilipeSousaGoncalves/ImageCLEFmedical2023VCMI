@@ -38,11 +38,28 @@ $ python data_preprocessing/captions_stats.py --base_dir {path_to_dataset_dir}
 ```
 
 
-### Get all the concepts of the dataset (train & valid splits)
-To get the list of all the concepts of the dataset (train & valid splits), run:
+### Get all the concepts of the dataset (train & validation splits)
+To get the list of all the concepts of the dataset (train & validation splits), run:
 ```bash
 $ python data_preprocessing/get_all_concepts_from_csvs.py --base_dir {path_to_dataset_dir} --processed_dir {path_to_processed_dataset_dir}
 ```
+
+
+### Get UMLS Information related to the concepts of the database
+To get the UMLS Information related to the concepts of the database, run:
+```bash
+$ python data_preprocessing/get_umls_information.py --base_dir {path_to_dataset_dir} --processed_dir {path_to_processed_dataset_dir} --api_key {your_uts_api_key}
+```
+
+You can go to [https://documentation.uts.nlm.nih.gov/rest/authentication.html](https://documentation.uts.nlm.nih.gov/rest/authentication.html) for more information about getting your own API key.
+
+
+### Merge Train and Validation Subsets
+Although more useful for the competition, we leave you with a script to generate a single .CSV file with all the data samples (train and validation splits):
+```bash
+$ python data_preprocessing/merge_train_val.py --base_dir {path_to_dataset_dir} --base_file {path_to_the_ImageCLEFmedical_Caption_2023_concept_detection_train_labels.csv}
+```
+
 
 ## Concept Detection
 TBA
